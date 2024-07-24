@@ -867,7 +867,7 @@ Value Search::Worker::search(
             value = -qsearch<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1);
 
             // If the qsearch held, perform the regular search
-            if (value >= probCutBeta)
+            if (value >= probCutBeta || ((eval * 2) < (value * 3) && (value + eval) / 2 >= probCutBeta))
                 value =
                   -search<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1, depth - 4, !cutNode);
 
