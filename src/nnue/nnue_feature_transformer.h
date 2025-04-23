@@ -54,6 +54,7 @@ using psqt_vec_t = __m256i;
     #define vec_add_16(a, b) _mm512_add_epi16(a, b)
     #define vec_sub_16(a, b) _mm512_sub_epi16(a, b)
     #define vec_mulhi_16(a, b) _mm512_mulhi_epi16(a, b)
+    #define vec_mulhrs_16(a, b) _mm512_mulhrs_epi16(a, b)
     #define vec_zero() _mm512_setzero_epi32()
     #define vec_set_16(a) _mm512_set1_epi16(a)
     #define vec_max_16(a, b) _mm512_max_epi16(a, b)
@@ -77,6 +78,7 @@ using psqt_vec_t = __m256i;
     #define vec_add_16(a, b) _mm256_add_epi16(a, b)
     #define vec_sub_16(a, b) _mm256_sub_epi16(a, b)
     #define vec_mulhi_16(a, b) _mm256_mulhi_epi16(a, b)
+    #define vec_mulhrs_16(a, b) _mm256_mulhrs_epi16(a, b)
     #define vec_zero() _mm256_setzero_si256()
     #define vec_set_16(a) _mm256_set1_epi16(a)
     #define vec_max_16(a, b) _mm256_max_epi16(a, b)
@@ -100,6 +102,7 @@ using psqt_vec_t = __m128i;
     #define vec_add_16(a, b) _mm_add_epi16(a, b)
     #define vec_sub_16(a, b) _mm_sub_epi16(a, b)
     #define vec_mulhi_16(a, b) _mm_mulhi_epi16(a, b)
+    #define vec_mulhrs_16(a, b) _mm_mulhrs_epi16(a, b)
     #define vec_zero() _mm_setzero_si128()
     #define vec_set_16(a) _mm_set1_epi16(a)
     #define vec_max_16(a, b) _mm_max_epi16(a, b)
@@ -481,12 +484,7 @@ class FeatureTransformer {
             // to the left by 1, so we compensate by shifting less before
             // the multiplication.
 
-            constexpr int shift =
-    #if defined(USE_SSE2)
-              7;
-    #else
-              6;
-    #endif
+            constexpr int shift = 6;
 
             for (IndexType j = 0; j < NumOutputChunks; ++j)
             {
@@ -497,8 +495,8 @@ class FeatureTransformer {
                 const vec_t sum1a = vec_min_16(in1[j * 2 + 0], One);
                 const vec_t sum1b = vec_min_16(in1[j * 2 + 1], One);
 
-                const vec_t pa = vec_mulhi_16(sum0a, sum1a);
-                const vec_t pb = vec_mulhi_16(sum0b, sum1b);
+                const vec_t pa = vec_mulhrs_16(sum0a, sum1a);
+                const vec_t pb = vec_mulhrs_16(sum0b, sum1b);
 
                 out[j] = vec_packus_16(pa, pb);
             }
