@@ -125,7 +125,7 @@ using psqt_vec_t = int32x4_t;
     #define vec_add_16(a, b) vaddq_s16(a, b)
     #define vec_sub_16(a, b) vsubq_s16(a, b)
     #define vec_mulhi_16(a, b) vqdmulhq_s16(a, b)
-    #define vec_mulhrs_16(a, b) vqrdmulhq_s16(a, b)
+    #define vec_mulhrs_16(a, b) not_vqrdmulhq_s16(a, b)
     #define vec_zero() \
         vec_t { 0 }
     #define vec_set_16(a) vdupq_n_s16(a)
@@ -470,10 +470,11 @@ class FeatureTransformer {
             // to the left by 1, so we compensate by shifting less before
             // the multiplication.
 
+            constexpr int shift =
     #if defined(USE_SSE2)
-                constexpr int shift = 8;
+              8;
     #else
-                constexpr int shift = 7;
+              7;
     #endif
 
             for (IndexType j = 0; j < NumOutputChunks; ++j)
